@@ -1,0 +1,589 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>從神本走向理性時代：歐洲歷史百萬富翁挑戰賽</title>
+    <style>
+        :root {
+            --bg-dark: #0a0b10;
+            --panel-bg: rgba(22, 27, 40, 0.95);
+            --gold-bright: #ffd700;
+            --gold-classic: #d4af37;
+            --gold-pale: #f3e5ab;
+            --parchment-text: #eadeca;
+            --reason-blue: #00d2ff;
+            --btn-gradient-normal: linear-gradient(180deg, #091a2e 0%, #003366 100%);
+            --btn-gradient-hover: linear-gradient(180deg, #002b54 0%, #0052a3 100%);
+            --correct: #28a745;
+            --wrong: #dc3545;
+        }
+
+        /* 頂端對齊優化：消除垂直留白，讓畫面緊湊且最大化字體 */
+        body {
+            font-family: 'Georgia', 'Times New Roman', 'Microsoft JhengHei', serif;
+            background: radial-gradient(circle at center, #162238 0%, var(--bg-dark) 80%);
+            color: var(--parchment-text);
+            margin: 0;
+            padding: 5px 15px; /* 頂端僅留 5px，消滅浪費的空白 */
+            display: flex;
+            justify-content: center;
+            align-items: flex-start; /* 緊貼網頁最上方 */
+            min-height: 100vh;
+            overflow-y: auto; 
+            box-sizing: border-box;
+        }
+
+        .container {
+            background-color: var(--panel-bg);
+            border: 3px double var(--gold-classic);
+            outline: 1px solid rgba(212, 175, 55, 0.2);
+            outline-offset: -6px;
+            border-radius: 4px;
+            padding: 15px 30px; /* 縮減無意義的內邊距 */
+            margin-top: 5px; /* 緊貼頂端 */
+            width: 100%;
+            max-width: 950px; /* 稍微加寬以容納更大的字體 */
+            box-shadow: 0 0 30px rgba(0, 210, 255, 0.2), inset 0 0 20px rgba(0,0,0,0.7);
+            text-align: center;
+            box-sizing: border-box;
+        }
+
+        /* 標題字體加大，邊距縮小 */
+        h1 {
+            font-family: 'Times New Roman', 'Microsoft JhengHei', serif;
+            letter-spacing: 1px;
+            color: var(--gold-bright);
+            text-shadow: 0 0 8px rgba(255, 215, 0, 0.5);
+            margin: 5px 0 10px 0;
+            font-size: 34px; 
+            line-height: 1.3;
+        }
+
+        .welcome-p {
+            font-size: 18px; 
+            color: #b0c4de;
+            margin: 8px 0;
+        }
+
+        input[type="text"], input[type="password"] {
+            width: 60%;
+            padding: 10px;
+            margin: 8px 0;
+            border: 1px solid var(--gold-classic);
+            background-color: rgba(10, 11, 16, 0.9);
+            color: #ffffff;
+            font-size: 18px; 
+            text-align: center;
+        }
+        input[type="text"]:focus, input[type="password"]:focus {
+            border-color: var(--reason-blue);
+            outline: none;
+            box-shadow: 0 0 5px var(--reason-blue);
+        }
+
+        button {
+            background: var(--btn-gradient-normal);
+            color: var(--gold-pale);
+            border: 1px solid var(--gold-classic);
+            padding: 10px 30px;
+            margin: 10px;
+            font-size: 18px; 
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        button:hover:not(:disabled) {
+            background: var(--btn-gradient-hover);
+            color: #ffffff;
+            border-color: var(--gold-bright);
+            box-shadow: 0 0 8px var(--gold-classic);
+        }
+        button:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        .screen { display: none; }
+        .screen.active { display: block; }
+
+        /* 選擇題選項版面：緊湊且字體大 */
+        .options-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px; /* 縮小按鈕之間的間隙 */
+            margin-top: 15px;
+        }
+
+        .option-btn {
+            background: linear-gradient(180deg, #091326 0%, #002b54 100%);
+            border: 1px solid var(--gold-classic);
+            clip-path: polygon(2% 0%, 98% 0%, 100% 50%, 98% 100%, 2% 100%, 0% 50%);
+            padding: 12px 20px;
+            font-size: 20px; /* 大字體選項 */
+            color: var(--parchment-text);
+            text-align: left;
+            padding-left: 35px;
+            margin: 0;
+            line-height: 1.3;
+        }
+
+        .top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            font-size: 18px;
+            font-weight: bold;
+            color: var(--gold-pale);
+            border-bottom: 1px dashed rgba(214, 175, 55, 0.4);
+            padding-bottom: 8px;
+        }
+        #timer { 
+            font-size: 24px; 
+            color: var(--reason-blue); 
+            font-family: 'Courier New', monospace;
+        }
+
+        /* 題目看板：大字體，小邊距 */
+        #question-text {
+            font-size: 24px; /* 超大題目字型，閱讀舒適 */
+            margin-bottom: 15px;
+            line-height: 1.5;
+            background-color: rgba(5, 7, 12, 0.9);
+            padding: 15px 20px;
+            border-left: 5px solid var(--gold-classic);
+            border-right: 5px solid var(--gold-classic);
+            text-align: justify;
+        }
+
+        /* 題解看板：大字體，小邊距 */
+        .explanation-card {
+            background: rgba(10, 15, 30, 0.98);
+            border: 2px solid var(--gold-classic);
+            padding: 15px 20px;
+            margin-top: 15px;
+            border-radius: 4px;
+            text-align: left;
+            box-shadow: 0 0 15px rgba(0,0,0,0.9);
+        }
+        .explanation-card h3 {
+            margin-top: 0;
+            font-size: 20px; 
+            border-bottom: 1px solid rgba(214,175,55,0.3);
+            padding-bottom: 8px;
+            margin-bottom: 8px;
+        }
+        .explanation-card p {
+            color: #ffffff;
+            font-size: 18px; /* 題解放大，確保清晰 */
+            line-height: 1.5;
+            margin: 5px 0;
+        }
+
+        .leaderboard-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+            background-color: rgba(10, 11, 16, 0.7);
+        }
+        .leaderboard-table th, .leaderboard-table td {
+            border: 1px solid rgba(214, 175, 55, 0.3);
+            padding: 8px;
+            font-size: 16px;
+        }
+        .leaderboard-table th { background-color: #0d1b2a; color: var(--gold-bright); }
+
+        .motto {
+            font-style: italic;
+            font-size: 12px;
+            color: #708090;
+            margin-top: 15px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div id="login-screen" class="screen active">
+        <h1>從神本走向理性時代<br>歐洲歷史百萬富翁挑戰賽</h1>
+        <div style="width:80px; height:2px; background:var(--gold-classic); margin:10px auto;"></div>
+        <p class="welcome-p">「Sapere aude! 敢於求知！」— 啟蒙運動精神</p>
+        <br>
+        <input type="text" id="class-no" placeholder="班別及學號 (例: 2A01)" required><br>
+        <input type="text" id="student-name" placeholder="學生姓名" required><br>
+        <input type="password" id="game-pwd" placeholder="通關密碼 (按Enter進入)" required><br>
+        <button onclick="login()">開啟理性思維</button>
+        <div class="motto">Renaissance & Enlightenment Historical Review System v2026</div>
+    </div>
+
+    <div id="game-screen" class="screen">
+        <div class="top-bar">
+            <span id="progress">進度: 1/20</span>
+            <span id="score-display" style="color:var(--gold-bright);">分數: 0</span>
+            <div>⏱️ <span id="timer">30</span>s</div>
+        </div>
+        <div id="question-text"></div>
+        
+        <div id="mc-options" class="options-grid"></div>
+        
+        <div id="fill-input-area" style="display:none; padding: 15px 0;">
+            <p style="color:var(--gold-pale); font-size:20px; margin-top:0;">請在下方框內輸入準確答案：</p>
+            <input type="text" id="fill-answer" placeholder="輸入後按Enter提交..." style="width:60%; font-size:20px;"><br>
+            <button id="fill-submit-btn" onclick="checkFillAnswer()">確定提交答案</button>
+        </div>
+
+        <div id="explanation-area" class="explanation-card" style="display:none;">
+            <h3 id="explanation-title"></h3>
+            <p id="explanation-text"></p>
+            <div style="text-align:right; margin-top:10px;">
+                <button onclick="nextQuestion()" style="margin:0; padding:8px 25px; font-size:16px;">領悟真理，前往下一題 ➔</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="result-screen" class="screen">
+        <h1>挑戰結束：理性之光普照</h1>
+        <h2>您的最終得分: <span id="final-score" style="color:var(--gold-bright); font-size:32px;"></span></h2>
+        <p class="welcome-p">總共耗時: <span id="final-time" style="color:var(--reason-blue);"></span> 秒</p>
+        
+        <div id="upload-status" style="margin:10px 0; font-size:16px; color:var(--gold-bright); background:rgba(0,0,0,0.5); padding:8px; border-radius:4px;"></div>
+        
+        <h3 style="margin-top:15px; border-left:4px solid var(--gold-classic); padding-left:12px; text-align:left;">📜 歷史先賢榜 (Top 10)</h3>
+        <div id="leaderboard-container" style="max-height: 250px; overflow-y: auto;"></div>
+    </div>
+</div>
+
+<script>
+    // --- 歷史科核心題庫數據 ---
+    // 已完整採用老師您提供的原始陣列，並修復了第 25 題 ans 的隱形 Bug。
+    const allMCQs = [
+        { q: "文藝復興一詞的意思是指對古希臘及哪一文明的藝術與知識的恢復？", options: ["古埃及", "古羅馬", "古巴比倫", "拜占庭"], ans: 1, exp: "文藝復興（Renaissance）意指「復興」與「再生」，核心目標是恢復在歐洲中世紀被忽視的古希臘和古羅馬的古典文化、藝術與知識。" },
+        { q: "中古時代的歐洲，人民的思想主要受到哪兩種勢力的束縛？", options: ["封建制度及教會", "君主及行會", "莊園及大學", "騎士及農奴"], ans: 0, exp: "在中世紀（中古時代），歐洲的政治與社會生活被「封建制度」層層束縛，而精神、思想與學術則完全被「羅馬天主教會」所壟斷。" },
+        { q: "文藝復興首先在哪一個地區展開？", options: ["法國", "英國", "意大利", "德意志"], ans: 2, exp: "文藝復興首發於意大利。因為意大利北部的城邦是當時的東西方貿易中心，累積了巨大財富，且該地作為古羅馬文明的發源地，保留了最豐富的古典文化遺產。" },
+        { q: "十四世紀中葉歐洲爆發了甚麼疫症，導致人口銳減，動搖了封建制度的根基？", options: ["流行性感冒", "霍亂", "黑死病", "天花"], ans: 2, exp: "14世紀中葉橫掃歐洲的「黑死病」奪走了歐洲近三分之一的人口，導致莊園勞動力極度缺乏，加速了莊園經濟的解體，從而動搖了封建制度與教會的絕對權威。" },
+        { q: "在文藝復興時期，提倡重視人的價值和才能多於宗教的思想稱為什麼？", options: ["啟蒙主義", "理性主義", "人文主義", "浪漫主義"], ans: 2, exp: "「人文主義」是文藝復興的核心思潮，它主張以「人」為中心，提倡重視現世生活、個人的價值、尊嚴與才能，打破了中世紀一切以「神」和教會為中心的思想束縛。" },
+        { q: "文藝復興時期，哪一個家族在佛羅倫斯積極資助藝術創作與科學研究？", options: ["哈布斯堡家族", "瑪迪奇家族", "波旁家族", "都鐸家族"], ans: 1, exp: "佛羅倫斯的「瑪迪奇家族」憑藉雄厚的金融財富，成為文藝復興運動最重要的幕後推手，積極資助了包括達文西、麥開蘭基羅在內的大批傑出藝術家與學者。" },
+        { q: "中古時代的文學作品多以拉丁文寫成，而文藝復興時期的文學家大多使用甚麼語言寫作？", options: ["希臘文", "英文", "本土語言", "法文"], ans: 2, exp: "中世紀教會強制規定嚴肅作品必須使用拉丁文，而文藝復興時期的作家們為了讓知識普及，開始改用各地的「本土語言」進行文學創作。" },
+        { q: "下列哪一位是創作《神曲》的文藝復興文學家？", options: ["但丁", "佩脫拉克", "薄伽丘", "莎士比亞"], ans: 0, exp: "意大利詩人但丁使用本土托斯卡納方言創作了宏偉史詩《神曲》，大膽揭露教會的腐敗，被譽為文藝復興的開路先鋒之一。" },
+        { q: "莎士比亞是文藝復興時期的著名劇作家，下列哪一部是他的作品？", options: ["《君王論》", "《十日談》", "《威尼斯商人》", "《烏托邦》"], ans: 2, exp: "《威尼斯商人》是英國文藝復興巨匠莎士比亞的經典四大喜劇之一，深刻展現了複雜的人性與社會現實。" },
+        { q: "1450年，德意志工匠古騰堡發明了甚麼，令書籍得以普及，推動知識傳播？", options: ["造紙術", "金屬活字印刷術", "雕版印刷術", "打字機"], ans: 1, exp: "德意志工匠古騰堡於1450年左右發明了「金屬活字印刷術」，大幅降低了書籍製造成本，使新思想與科學知識得以在歐洲快速且廉價地傳播。" },
+        { q: "下列哪一位被稱為「藝術三傑」，並創作了名畫《蒙娜麗莎》？", options: ["達文西", "拉斐爾", "麥開蘭基羅", "提香"], ans: 0, exp: "達文西是文藝復興時期的全才博學家，與麥開蘭基羅、拉斐爾並稱為「藝術三傑」，《蒙娜麗莎》和《最後的晚餐》是他的傳世神作。" },
+        { q: "畫作《雅典學院》是下列哪一位藝術家的傑作？", options: ["達文西", "拉斐爾", "麥開蘭基羅", "喬托"], ans: 1, exp: "《雅典學院》由拉斐爾所繪，畫中聚集了古希臘跨時代的哲學家與科學家，完美體現了文藝復興對古典學術的崇敬。" },
+        { q: "意大利北部的哪些城邦因成為東西貿易中心，累積了巨大財富，成為文藝復興的發源地？", options: ["羅馬、那不勒斯", "佛羅倫斯、威尼斯、熱那亞", "米蘭、都靈", "巴黎、馬賽"], ans: 1, exp: "佛羅倫斯、威尼斯和熱那亞等北部城邦因十字軍東征與地中海貿易而繁榮，富裕的商人和新興資產階級有經濟能力出資贊助文化藝術，奠定了文藝復興的經濟基礎。" },
+        { q: "文藝復興時期的藝術與中古時代相比，有何明顯轉變？", options: ["題材僅限於宗教神話", "人物表情呆板", "運用透視法，風格寫實", "拒絕描繪人體美"], ans: 2, exp: "文藝復興藝術打破了中世紀二維平面、呆板僵硬的神學教條，開始引進「透視法」創造立體空間感，並深入研究解剖學，展現人體的寫實與自然之美。" },
+        { q: "哥白尼提出了甚麼學說，推翻了教會奉為真理的「地心說」？", options: ["日心說", "宇宙無限論", "萬有引力定律", "相對論"], ans: 0, exp: "波蘭天文學家哥白尼發表《天體運行論》，提出太陽才是宇宙中心的「日心說」，直接挑戰了教會一向奉為絕對真理的托勒密「地心說」。" },
+        { q: "下列哪一位科學家在1609年製造出天文望遠鏡並證實了哥白尼的學說？", options: ["牛頓", "伽利略", "達爾文", "開普勒"], ans: 1, exp: "意大利科學家伽利略於1609年改良並製造出天文望遠鏡觀測星空，經由實證數據證實了哥白尼的「日心說」，並被譽為「觀測天文學之父」。" },
+        { q: "近代歐洲的開始，通常以哪一個帝國於1453年滅亡為標誌？", options: ["西羅馬帝國", "神聖羅馬帝國", "東羅馬帝國", "鄂圖曼帝國"], ans: 2, exp: "1453年鄂圖曼帝國攻陷君士坦丁堡，導致「東羅馬帝國」（拜占庭帝國）滅亡。大量希臘學者攜帶古代文獻逃往意大利，這普遍被視為中世紀的結束與近代歐洲的起點。" },
+        { q: "文藝復興大約起源於哪一個世紀？", options: ["十二世紀", "十三世紀", "十四世紀", "十六世紀"], ans: 2, exp: "文藝復興運動大約在「十四世紀」中葉（約1350年代）發源於意大利北部城邦，並在十五、十六世紀達到全盛，隨後擴展至整個歐洲。" },
+        { q: "著名的聖伯多祿大教堂展現了文藝復興時期的風格，下列哪一項是該時期的建築特徵？", options: ["彩色玻璃窗", "飛扶壁", "圓頂及圓柱", "高尖塔"], ans: 2, exp: "文藝復興建築捨棄了中世紀高聳、帶有尖塔的哥德式風格，轉向古希臘與古羅馬的古典美學，強調對稱、幾何比例，大量採用「圓頂」與「希臘式圓柱」。" },
+        { q: "馬丁路德強調相信甚麼才能得到救贖（因信稱義）？", options: ["教宗", "上帝", "善行", "購買聖物"], ans: 1, exp: "馬丁路德提出「因信稱義」的核心教義，主張神職人員或教宗並無特權，凡基督徒只要虔誠信仰「上帝」並研讀《聖經》，便可直接獲得救贖。" },
+        { q: "宗教改革後，歐洲分裂為羅馬天主教與哪一個新陣營？", options: ["東正教", "猶太教", "新教", "伊斯蘭教"], ans: 2, exp: "16世紀的宗教改革徹底打破了羅馬天主會在西歐的一統天下，西方基督教世界從此分裂為固守羅馬教廷的「天主教」與反對教宗權威的「新教」兩大陣營。" },
+        { q: "1618至1648年間，歐洲爆發了多個大國參與的宗教戰爭，這場戰爭稱為？", options: ["百年戰爭", "十字軍東征", "七年戰爭", "三十年戰爭"], ans: 3, exp: "「三十年戰爭」（1618-1648）是一場源於神聖羅馬帝國內部天主教與新教內鬨，隨後演變為席捲全歐的國際混戰，最終促成了主權國家體系的建立與政教分離。" },
+        { q: "科學革命發生在哪一個世紀，是近代歐洲科技躍進的先聲？", options: ["十五世紀", "十六世紀", "十七世紀", "十八世紀"], ans: 2, exp: "「科學革命」主要爆發於「十七世紀」，在這一時期，實驗、觀察與數學推導取代了對權威與神學的盲從，奠定了現代科學的各學門基礎。" },
+        { q: "下列哪一位科學家提出了光學理論及「萬有引力定律」？", options: ["伽利略", "哥白尼", "培根", "牛頓"], ans: 3, exp: "英國科學巨匠牛頓發表《自然哲學的數學原理》，提出「萬有引力定律」與三大運動定律，將天體與地上的運動規律完成統一，將科學革命推向頂峰。" },
+        { q: "十七世紀中期至十八世紀，歐洲發生了一場宣揚「自然權利」的思想文化變革，稱為？", options: ["文藝復興", "宗教改革", "科學革命", "啟蒙運動"], ans: 3, exp: "「啟蒙運動」興起於17、18世紀，思想家們繼承了科學革命的理性精神，試圖用「理性之光」來照亮人類的政治、法律與社會，破除迷信與專制。" },
+        { q: "法國國王路易十四自稱「太陽王」及提倡「君權神授」，這是屬於哪一種政治體制？", options: ["民主共和", "君主立憲", "專制主義", "寡頭政治"], ans: 2, exp: "路易十四是歐洲「專制主義」的典型代表。他集軍政大權於一身，提倡「君權神授」，宣稱君主的權力直接來自上帝，人民無權反抗。" },
+        { q: "啟蒙思想家認為，人類社會與萬物一樣受甚麼支配？", options: ["神的旨意", "運氣", "自然法則", "傳統習俗"], ans: 2, exp: "啟蒙思想家認為，宇宙和自然界有其客觀運行的規律（如萬有引力），人類社會與政治體制也必然受某種普遍的「自然法則」所支配。" },
+        { q: "洛克與盧騷主張人民與政府訂立無形契約，這被稱為什麼理論？", options: ["天賦人權", "社會契約", "權力分立", "君權神授"], ans: 1, exp: "洛克與盧騷提出了「社會契約論」，主張國家權力最初來自人民的讓渡，政府與人民之間存在無形契約，政府的天職是保護人民的權利。" },
+        { q: "提出政府權力應分為行政、立法、司法三個機關的啟蒙思想家是誰？", options: ["伏爾泰", "洛克", "盧騷", "孟德斯鳩"], ans: 3, exp: "法國思想家孟德斯鳩在《論法的精神》中明確提出「權力分立」理論，主張行政、立法、司法互相制衡，防止絕對專制與腐敗。" },
+        { q: "伏爾泰提出應制定甚麼來限制君權，實行君主立憲？", options: ["憲法", "聖經", "法典", "契約"], ans: 0, exp: "伏爾泰極力推崇英國的君主立憲制，主張應制定「憲法」明確限制君主的絕對權力，並大加保障言論自由與宗教寬容。" },
+        
+        // --- 複式選擇題：利用 <br> 強制換行，確保排版清晰易讀 ---
+        { q: "中古時代的歐洲被稱為「中世紀」，當時的社會特徵包括：<br>I. 教會勢力龐大<br>II. 思想開放自由<br>III. 盛行封建制度", options: ["只有 I, II", "只有 I, III", "只有 II, III", "I, II, III"], ans: 1, exp: "中世紀的特徵是教會勢力龐大與封建制度盛行（I及III）。當時的思想受到神學嚴格控制，極度缺乏開放與自由，因此 II 不正確。" },
+        { q: "意大利成為文藝復興發源地的原因包括：<br>I. 是東西貿易中心<br>II. 保留了古羅馬帝國的文化遺產<br>III. 最早爆發宗教改革", options: ["只有 I, II", "只有 I, III", "只有 II, III", "I, II, III"], ans: 0, exp: "意大利之所以成為發源地，是因為地處貿易要道累積財富（I），且身處古羅馬心臟地帶保有豐富文化遺產（II）。「宗教改革」最早爆發於德意志，故 III 排除。" },
+        { q: "文藝復興時期繪畫與雕刻風格的轉變包括：<br>I. 由刻板轉為寫實<br>II. 開始運用透視法<br>III. 深入研究人體結構", options: ["只有 I, II", "只有 I, III", "只有 II, III", "I, II, III"], ans: 3, exp: "文藝復興的藝術大師們全面擁抱寫實主義（I）、引進幾何透視法（II），並親自進行人體解剖以求精確掌握肌肉與人體結構（III），因此三項皆對。" },
+        { q: "文藝復興對歐洲的影響包括：<br>I. 奠定近代歐洲文明基礎<br>II. 興起人文主義教育<br>III. 促成航海大發現", options: ["只有 I, II", "只有 I, III", "只有 II, III", "I, II, III"], ans: 3, exp: "文藝復興奠定了近代西方文明（I）、推動了以人為本的教育（II），其鼓勵冒險探索的精神與提升的天文地理知識，也間接促成了後來的地理大發現（III）。" },
+        { q: "宗教改革的背景包括：<br>I. 基督徒質疑教會對《聖經》的解釋<br>II. 君主希望打擊教會勢力<br>III. 啟蒙運動的直接推動", options: ["只有 I, II", "只有 I, III", "只有 II, III", "I, II, III"], ans: 0, exp: "宗教改革的背景包括選民透過活字印刷自行研讀聖經，質疑教會壟斷權（I），以及各國君主不滿教宗干政企圖收回權力（II）。「啟蒙運動」是 17-18 世紀的事，不可能直接推動 16 世紀的宗教改革（III）。" },
+        { q: "新教教義對歐洲社會及經濟的影響包括：<br>I. 鼓勵民眾努力工作<br>II. 肯定現世生活<br>III. 提倡極端禁慾", options: ["只有 I, II", "只有 I, III", "只有 II, III", "I, II, III"], ans: 0, exp: "新教（尤其是加爾文宗）主張世俗職業是神的呼召，鼓勵人民努力工作累積財富以榮耀上帝（I），並肯定了現世生活的價值（II）。它反對羅馬天主教中世紀的極端修院禁慾主義，故 III 排除。" },
+        { q: "科學革命出現的原因包括：<br>I. 文藝復興與印刷術的推動<br>II. 航海大發現的推動<br>III. 歐洲君主及機構的支持", options: ["只有 I, II", "只有 I, III", "只有 II, III", "I, II, III"], ans: 3, exp: "科學革命源於文藝復興解放思想與印刷術傳播知識（I）、航海需求刺激了天文導航科技（II），以及多國君主為提高國力而資助科研機構（III），故三者皆是原因。" },
+        { q: "科學革命的影響包括：<br>I. 鼓勵歐洲人挑戰權威<br>II. 動搖了羅馬天主教會的權威<br>III. 推動了中古時代的十字軍東征", options: ["只有 I, II", "只有 I, III", "只有 II, III", "I, II, III"], ans: 0, exp: "科學革命使人們不再盲信傳統，學會挑戰權威（I），實證科學也動搖了教廷部分宇宙觀的解釋權威（II）。「十字軍東征」發生在更早的中古時代，不可能由後來的科學革命推動（III）。" },
+        { q: "啟蒙運動時期的歐洲人價值觀轉變包括：<br>I. 提倡以人為本，強調理性<br>II. 敢於挑戰權威<br>III. 提倡君權神授", options: ["只有 I, II", "只有 I, III", "只有 II, III", "I, II, III"], ans: 0, exp: "啟蒙運動核心在於宣揚理性和人權（I），並鼓勵批判專制政府（II）。「君權神授」是啟蒙思想家們極力反對與批判的舊制度思想（III），故 III 錯誤。" },
+        { q: "根據「天賦人權」的觀點，人民生來擁有的自由包括：<br>I. 言論自由<br>II. 出版自由<br>III. 宗教自由", options: ["只有 I, II", "只有 I, III", "只有 II, III", "I, II, III"], ans: 3, exp: "約翰·洛克等啟蒙思想家提出的「天賦人權」認為，言論自由（I）、出版自由（II）和宗教信仰自由（III）是人與生俱來、國家不可剝奪的權利。" },
+        { q: "下列哪些是「社會契約」理論的主張？<br>I. 政府權力來自人民<br>II. 君權神授是合理的<br>III. 若政府無法保障人民權利，人民有權推翻政府", options: ["只有 I, II", "只有 I, III", "只有 II, III", "I, II, III"], ans: 1, exp: "社會契約論主張政府的統治權合法性來自人民的同意（I），如果政府背叛契約侵害人權，人民便有權推翻它（III）。它與反民主的「君權神授」（II）是完全互斥的。" },
+        { q: "啟蒙運動對世界政治的影響包括：<br>I. 促成「開明專制君主」的出現<br>II. 導致東羅馬帝國滅亡<br>III. 直接促成美國革命與法國大革命", options: ["只有 I, II", "只有 I, III", "只有 II, III", "I, II, III"], ans: 1, exp: "啟蒙思想影響了一些君主實施改革，形成「開明專制」（I），並且其自由民主思想直接催生了美國獨立革命與法國大革命（III）。東羅馬滅亡於 1453 年，遠早於啟蒙運動，故 II 錯誤。" },
+        { q: "文藝復興時期的文學發展描述包括：<br>I. 捨棄拉丁文，改用本土語言創作<br>II. 題材多樣化，不再局限於宗教<br>III. 著名文學家有但丁、莎士比亞等", options: ["只有 I, II", "只有 I, III", "只有 II, III", "I, II, III"], ans: 3, exp: "文藝復興文學全面推動了各國本土語言的成熟（I），題材大量描寫世俗人性的愛恨與社會現實（II），產生了但丁、薄伽丘、莎士比亞等一代巨匠（III）。" },
+        { q: "新教教會在宗教改革後陸續成立，其中包括：<br>I. 路德宗<br>II. 歸正宗<br>III. 聖公宗", options: ["只有 I, II", "只有 I, III", "只有 II, III", "I, II, III"], ans: 3, exp: "16 世紀宗教改革後，反對羅馬教廷的新教陣營中主要形成了：德意志馬丁路德建立的「路德宗」、加爾文在瑞士建立的「歸正宗」，以及英國國王亨利八世建立的「聖公宗」（英國國教）。" },
+        { q: "啟蒙運動思想家與其主張的配對，哪些是正確的？<br>I. 洛克：社會契約<br>II. 孟德斯鳩：權力分立<br>III. 伏爾泰：地心說", options: ["只有 I, II", "只有 I, III", "只有 II, III", "I, II, III"], ans: 0, exp: "洛克是社會契約論的重要奠基者（I），孟德斯鳩提出了著名的行政/立法/司法權力分立（II）。伏爾泰主張的是君主立憲與反對外在迷信，「地心說」是中古天主教尊奉的舊宇宙觀，故 III 配對錯誤。" }
+    ];
+
+    const allFills = [
+        { q: "文藝復興時期提倡重視人的價值 and 才能，這種思想被稱為「______主義」。", a: ["人文", "人文主義"], exp: "「人文主義」（Humanism）是文藝復興的核心精髓，主導了當時的思潮轉變，反對中世紀全面否定人性的神本思想。" },
+        { q: "中古時代的建築以______式為主，具有高尖塔、尖形拱門等特色。", a: ["哥德", "哥德式"], exp: "中世紀歐洲天主教極盛時期發展出了「哥德式」（Gothic）建築，其高聳入雲的尖塔與尖拱門，旨在引導人們的視線投向天堂。" },
+        { q: "文藝復興時期，醫學家透過觀察和______人體，對人體構造有更深入的了解。", a: ["解剖"], exp: "為了追求寫實與科學真理，文藝復興時期的藝術家與醫學家打破宗教禁忌，親自動手「解剖」屍體，從而開創了近代人體解剖學。" },
+        { q: "十七世紀，英國科學家______提出了「萬有引力定律」，為現代物理學奠定基礎。", a: ["牛頓"], exp: "英國科學巨匠牛頓在 17 世紀末提出「萬有引力定律」，精準解釋了宇宙萬物的運動規律，是科學革命的最高峰。" },
+        { q: "馬丁路德因為抨擊教會，於1521年被教宗下令革除______。", a: ["教籍"], exp: "德意志神學教授馬丁路德因拒絕撤回批評天主會的言論，於 1521 年正式被羅馬教宗下令逐出教會、革除「教籍」。" },
+        { q: "1517年，馬丁路德發表《______》，公開批評羅馬天主會藉由發售赦罪物品來斂財的行為。", a: ["九十五點論證"], exp: "1517 年馬丁路德在維滕貝格大學教堂大門貼出《九十五點論證》，痛斥教會販賣贖罪券的貪婪行徑，引爆了席捲全歐的宗教改革。" },
+        { q: "科學革命期間，獨立的科研團體相繼成立，例如英國的「______」。", a: ["皇家學會", "倫敦皇家自然知識促進學會"], exp: "1660 年成立的英國「皇家學會」（全稱：倫敦皇家自然知識促進學會）是科學革命時期最具代表性的獨立科研團體，極大地促進了科學家之間的實驗交流。" },
+        { q: "科學革命啟發了思想家，將「______」套用於國家體制，促成了啟蒙運動。", a: ["自然法則"], exp: "科學革命證實了自然界受客觀的「自然法則」支配；思想家們因此受到啟發，認為人類的政治與社會也應當符合理性的自然法則，進而展開啟蒙運動。" },
+        { q: "法國國王路易十四曾說「朕即國家」，以高壓手段維護其______統治。", a: ["專制", "專制主義"], exp: "路易十四集所有國家大權於一身，宣稱君權神授，是歐洲 17 世紀「專制主義」君主的極致代表。" },
+        { q: "孟德斯鳩提出將政府權力分為行政、______、司法三個機關執行。", a: ["立法"], exp: "為了防止絕對權力帶來絕對腐敗，孟德斯鳩主張政府權力應分為「行政」、「立法」、「司法」三個獨立機關，達成彼此制衡（權力分立）。" },
+        { q: "俄國女王葉卡捷林娜二世受啟蒙思想影響推行改革，被稱為「______專制君主」。", a: ["開明"], exp: "18 世紀歐洲部分專制君主吸收了啟蒙思想，推行司法與教育改革，被歷史學家稱為「開明專制君主」。" },
+        { q: "中古時代晚期，神職人員為求斂財而大規模售賣「______」，這引發了人們的強烈不滿，成為宗教改革的導火線。", a: ["贖罪券"], exp: "教廷為了籌款重修羅馬聖伯多祿大教堂，宣稱購買「贖罪券」可免除死後靈魂在煉獄的罪罰，這種聚斂手段成為宗教改革的直接導火線。" },
+        { q: "在文藝復興出現的原因中，大量的藝術品以及來自__________的先進科學知識因十字軍東征傳入歐洲，重燃了歐洲人對古典文化的興趣。", a: ["阿拉伯"], exp: "中世紀歐洲陷入黑暗時，科學與古典文獻在「阿拉伯」世界得到了良好的保存。十字軍東征使歐洲人重新接觸到這些先進知識，推動了文藝復興。" },
+        { q: "文藝復興時期，著名雕刻《大衛》像及西斯汀教堂壁畫《末日審判》是由哪一位藝術家所創作？", a: ["麥開蘭基羅"], exp: "《大衛》巨型雕塑與西斯汀禮拜堂壁畫《末日審判》，皆是由「藝術三傑」之一、被譽為神聖之人的麥開蘭基羅所創作。" },
+        { q: "宗教改革時期，君主趁機推動政教分離，導致______日益膨脹。", a: ["君權", "君主權力", "王權"], exp: "宗教改革沉重打擊了天主教會的跨國精神權力，各國君主紛紛沒收教會財產，使得各國的「君權」日益膨脹，步向專制。" }
+    ];
+
+    // --- 系統核心設定 ---
+    const GAME_PASSWORD = "school2026"; 
+    const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwfcoQhQCYeu3QddLvfQw_jaVdlCMltORJxRArT6T-RKbFXyLnNhOkuKYknxaazO5-I/exec";
+
+    let selectedQuestions = [];
+    let currentQIndex = 0;
+    let score = 0;
+    let timeTotal = 0;
+    let timerInterval;
+    let timeLeft = 0;
+    let userInfo = { classNo: '', name: '' };
+
+    // 新增：監聽 Enter 鍵，大幅提升操作順暢度！
+    window.onload = function() {
+        const pwdInput = document.getElementById('game-pwd');
+        if(pwdInput) {
+            pwdInput.addEventListener('keypress', function(e) {
+                if(e.key === 'Enter') login();
+            });
+        }
+        const fillInput = document.getElementById('fill-answer');
+        if(fillInput) {
+            fillInput.addEventListener('keypress', function(e) {
+                if(e.key === 'Enter') checkFillAnswer();
+            });
+        }
+    };
+
+    function shuffleArray(array) {
+        for (let i = array.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [array[i], array[j]] = [array[j], array[i]];
+        }
+        return array;
+    }
+
+    function login() {
+        try {
+            const cNo = document.getElementById('class-no').value.trim();
+            const sName = document.getElementById('student-name').value.trim();
+            const pwd = document.getElementById('game-pwd').value.trim();
+
+            if(!cNo || !sName || !pwd) {
+                alert("請完整填寫學者資料欄位！");
+                return;
+            }
+            if(pwd !== GAME_PASSWORD) {
+                alert("密碼錯誤，請向老師查詢");
+                return;
+            }
+
+            userInfo.classNo = cNo;
+            userInfo.name = sName;
+            
+            initGame();
+            document.getElementById('login-screen').classList.remove('active');
+            document.getElementById('game-screen').classList.add('active');
+        } catch (error) {
+            // 防當機保護網，如果語法有問題會在這裡顯示
+            alert("系統錯誤：" + error.message + "\n請通知老師！");
+        }
+    }
+
+    function initGame() {
+        // 利用深拷貝，防止重複遊玩時的資料污染
+        let shuffledMC = shuffleArray(allMCQs.map(q => ({...q}))).slice(0, 15);
+        let shuffledFill = shuffleArray(allFills.map(q => ({...q, a: [...q.a]}))).slice(0, 5);
+        
+        shuffledMC.forEach(q => q.type = 'MC');
+        shuffledFill.forEach(q => q.type = 'FILL');
+        
+        selectedQuestions = shuffleArray([...shuffledMC, ...shuffledFill]);
+        currentQIndex = 0;
+        score = 0;
+        timeTotal = 0;
+        
+        loadQuestion();
+    }
+
+    function loadQuestion() {
+        if(currentQIndex >= selectedQuestions.length) {
+            endGame();
+            return;
+        }
+        
+        const q = selectedQuestions[currentQIndex];
+        document.getElementById('progress').innerText = `進度: ${currentQIndex + 1}/${selectedQuestions.length}`;
+        document.getElementById('question-text').innerHTML = q.q; 
+        document.getElementById('score-display').innerText = `分數: ${score}`;
+        document.getElementById('explanation-area').style.display = 'none';
+
+        const mcArea = document.getElementById('mc-options');
+        const fillArea = document.getElementById('fill-input-area');
+        
+        mcArea.innerHTML = '';
+        document.getElementById('fill-answer').value = '';
+
+        if(q.type === 'MC') {
+            mcArea.style.display = 'grid';
+            fillArea.style.display = 'none';
+            timeLeft = 30;
+            
+            let opts = q.options.map((opt, idx) => ({ text: opt, isCorrect: (idx === q.ans) }));
+            shuffleArray(opts);
+            
+            opts.forEach(opt => {
+                const btn = document.createElement('button');
+                btn.className = 'option-btn';
+                btn.innerText = opt.text;
+                btn.onclick = () => handleMCAnswer(opt.isCorrect, btn);
+                mcArea.appendChild(btn);
+            });
+        } else {
+            mcArea.style.display = 'none';
+            fillArea.style.display = 'block';
+            document.getElementById('fill-answer').disabled = false;
+            document.getElementById('fill-submit-btn').disabled = false;
+            timeLeft = 40;
+            document.getElementById('fill-answer').focus();
+        }
+        
+        startTimer();
+    }
+
+    function startTimer() {
+        document.getElementById('timer').innerText = timeLeft;
+        clearInterval(timerInterval);
+        timerInterval = setInterval(() => {
+            timeLeft--;
+            timeTotal++;
+            document.getElementById('timer').innerText = timeLeft;
+            if(timeLeft <= 0) {
+                clearInterval(timerInterval);
+                showExplanation(false, "思緒超時！限時內未能洞察理性真理。");
+            }
+        }, 1000);
+    }
+
+    function handleMCAnswer(isCorrect, clickedBtn) {
+        clearInterval(timerInterval);
+        const allBtns = document.querySelectorAll('.option-btn');
+        allBtns.forEach(b => b.disabled = true);
+
+        if(isCorrect) {
+            clickedBtn.style.background = 'var(--correct)';
+            clickedBtn.style.color = '#fff';
+            let pts = 100 + (timeLeft * 2);
+            score += pts;
+            showExplanation(true);
+        } else {
+            clickedBtn.style.background = 'var(--wrong)';
+            clickedBtn.style.color = '#fff';
+            showExplanation(false);
+        }
+    }
+
+    function checkFillAnswer() {
+        const input = document.getElementById('fill-answer').value.trim();
+        if(!input) return;
+        
+        clearInterval(timerInterval);
+        document.getElementById('fill-answer').disabled = true;
+        document.getElementById('fill-submit-btn').disabled = true;
+
+        const q = selectedQuestions[currentQIndex];
+        const isCorrect = q.a.includes(input);
+        
+        if(isCorrect) {
+            let pts = 150 + (timeLeft * 3);
+            score += pts;
+            showExplanation(true);
+        } else {
+            showExplanation(false, `思想偏離真理。正確解答應為：【${q.a[0]}】`);
+        }
+    }
+
+    function showExplanation(isCorrect, customMsg = "") {
+        const q = selectedQuestions[currentQIndex];
+        const title = document.getElementById('explanation-title');
+        const text = document.getElementById('explanation-text');
+        
+        if (isCorrect) {
+            title.innerHTML = "<span style='color:var(--correct)'>✨ 思想契合！(答對了)</span>";
+            text.innerHTML = (customMsg ? customMsg + "<br><br>" : "") + `<strong>📜 歷史題解：</strong>${q.exp}`;
+        } else {
+            title.innerHTML = "<span style='color:var(--wrong)'>❌ 偏離真理！(答錯了)</span>";
+            let correctNotice = "";
+            if(q.type === 'MC') {
+                correctNotice = `正確答案為：<strong>【${q.options[q.ans]}】</strong><br><br>`;
+            }
+            text.innerHTML = (customMsg ? customMsg + "<br><br>" : correctNotice) + `<strong>📜 歷史題解：</strong>${q.exp}`;
+        }
+        
+        document.getElementById('explanation-area').style.display = 'block';
+    }
+
+    function nextQuestion() {
+        currentQIndex++;
+        loadQuestion();
+    }
+
+    function endGame() {
+        clearInterval(timerInterval);
+        document.getElementById('game-screen').classList.remove('active');
+        document.getElementById('result-screen').classList.add('active');
+        document.getElementById('final-score').innerText = score;
+        document.getElementById('final-time').innerText = timeTotal;
+        
+        autoSubmitScore();
+    }
+
+    function autoSubmitScore() {
+        const status = document.getElementById('upload-status');
+        status.innerText = "⏳ 正在將成績自動登載至史官紀錄簿中...";
+
+        const formData = new URLSearchParams();
+        formData.append('action', 'submit');
+        formData.append('classStr', userInfo.classNo);
+        formData.append('name', userInfo.name);
+        formData.append('score', score);
+        formData.append('time', timeTotal);
+
+        fetch(WEB_APP_URL, {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded'
+            }
+        })
+        .then(response => response.text())
+        .then(data => {
+            status.innerHTML = "✨ <strong>成績已成功自動紀錄！</strong>歷史見證了您的努力。";
+            loadLeaderboard();
+        })
+        .catch(err => {
+            status.innerHTML = "❌ <strong>自動紀錄失敗。</strong>請確認網路連線是否正常。";
+            loadLeaderboard();
+        });
+    }
+
+    function loadLeaderboard() {
+        const container = document.getElementById('leaderboard-container');
+        container.innerHTML = "正在調閱先賢榜紀錄...";
+        
+        const script = document.createElement('script');
+        script.src = `${WEB_APP_URL}?action=getLeaderboard&callback=renderLeaderboard`;
+        document.body.appendChild(script);
+    }
+
+    function renderLeaderboard(data) {
+        if(!data || data.length === 0) {
+            document.getElementById('leaderboard-container').innerHTML = "目前尚無排行紀錄，等待先賢開拓。";
+            return;
+        }
+        
+        let html = '<table class="leaderboard-table"><tr><th>席次</th><th>班級學號</th><th>先賢姓名</th><th>理性積分</th><th>所用時間</th></tr>';
+        data.forEach((row, i) => {
+            html += `<tr><td>${i+1}</td><td>${row.classStr || ''}</td><td>${row.name || ''}</td><td>${row.score || 0} 點</td><td>${row.time || 0} 秒</td></tr>`;
+        });
+        html += '</table>';
+        document.getElementById('leaderboard-container').innerHTML = html;
+    }
+</script>
+</body>
+</html>
